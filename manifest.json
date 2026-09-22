@@ -1,0 +1,22 @@
+{
+  "manifest_version": 3,
+  "name": "Tabby",
+  "version": "0.1.0",
+  "description": "Nightly, judges every open tab and archives + closes the ones that are safe to close.",
+  "minimum_chrome_version": "121",
+  "background": {
+    "service_worker": "src/background.js",
+    "type": "module"
+  },
+  "action": {
+    "default_popup": "src/ui/popup.html",
+    "default_title": "Tabby"
+  },
+  "options_ui": {
+    "page": "src/ui/options.html",
+    "open_in_tab": true
+  },
+  "permissions": ["tabs", "storage", "alarms"],
+  "host_permissions": ["https://api.typesafe.ai/*"],
+  "optional_host_permissions": ["https://*.fly.dev/*"]
+}

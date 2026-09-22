@@ -1,0 +1,21 @@
+{
+  "_note": "Shape captured from a real api.typesafe.ai response (request id req_01a0c6e6...). Keys renamed to this project's t{i}_{slug} scheme; values are representative.",
+  "model": "jev-1.13.0",
+  "answers": {
+    "t0_wip": { "type": "noul", "noul": 0.91 },
+    "t0_disp": { "type": "noul", "noul": 0.04 },
+    "t0_retr": { "type": "noul", "noul": 0.88 },
+    "t0_save": { "type": "noul", "noul": 0.12 },
+    "t0_cat": {
+      "type": "choice",
+      "choice": "code_host_or_ticket",
+      "probabilities": { "code_host_or_ticket": 0.88, "documentation_or_reference": 0.12, "other": 0.0 },
+      "confidence": 0.81
+    },
+    "t1_wip": { "type": "noul", "noul": 0.03 },
+    "t1_disp": { "type": "noul", "noul": 0.97 },
+    "t1_retr": { "type": "noul", "noul": 0.99 },
+    "t1_save": { "type": "noul", "noul": 0.02 }
+  },
+  "usage": { "input_tokens": 341, "output_tokens": 22 }
+}

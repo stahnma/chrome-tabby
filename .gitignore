@@ -1,0 +1,8 @@
+node_modules/
+.DS_Store
+*.log
+
+# Nothing here holds secrets: the API key lives in chrome.storage.local, never on disk.
+# This is belt and braces in case that ever changes.
+.env
+*.key

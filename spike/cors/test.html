@@ -1,0 +1,28 @@
+<meta charset="utf-8">
+<title>Tabby CORS spike</title>
+<style>
+  body { font: 14px/1.5 system-ui, sans-serif; max-width: 52rem; margin: 2rem auto; padding: 0 1rem; }
+  h1 { font-size: 1.2rem; }
+  input { width: 100%; padding: .5rem; font: inherit; box-sizing: border-box; }
+  button { padding: .5rem 1rem; font: inherit; margin-right: .5rem; }
+  pre { background: #f4f4f5; padding: 1rem; overflow-x: auto; white-space: pre-wrap; word-break: break-word; }
+  .verdict { padding: .75rem 1rem; margin: 1rem 0; border-left: 4px solid #999; background: #fafafa; }
+  .good { border-color: #16a34a; }
+  .bad  { border-color: #dc2626; }
+</style>
+
+<h1>Tabby CORS spike</h1>
+<p>Answers one question: can we reach <code>api.typesafe.ai</code> from inside the extension,
+and from where. Run <strong>both</strong> buttons — the answers are expected to differ, and the
+difference is what decides the architecture.</p>
+
+<p><label>API key<br><input id="key" type="password" placeholder="sk-..." autocomplete="off"></label></p>
+<p>
+  <button id="sw">Test from service worker</button>
+  <button id="page">Test from this page</button>
+</p>
+
+<div id="verdict"></div>
+<pre id="out">(no run yet)</pre>
+
+<script type="module" src="test.js"></script>

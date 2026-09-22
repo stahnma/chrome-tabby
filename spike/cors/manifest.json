@@ -1,0 +1,17 @@
+{
+  "manifest_version": 3,
+  "name": "Tabby CORS spike",
+  "version": "0.0.1",
+  "description": "Throwaway. Answers one question: can an MV3 service worker POST to api.typesafe.ai?",
+  "minimum_chrome_version": "121",
+  "background": {
+    "service_worker": "sw.js",
+    "type": "module"
+  },
+  "options_ui": {
+    "page": "test.html",
+    "open_in_tab": true
+  },
+  "permissions": ["storage"],
+  "host_permissions": ["https://api.typesafe.ai/*"]
+}

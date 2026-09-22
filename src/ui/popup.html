@@ -1,0 +1,29 @@
+<meta charset="utf-8">
+<title>Tabby</title>
+<link rel="stylesheet" href="common.css">
+<style> body { width: 420px; max-height: 560px; overflow-y: auto; } </style>
+
+<div class="row">
+  <h1 class="grow">Tabby</h1>
+  <span id="mode" class="muted"></span>
+</div>
+
+<div class="row">
+  <button id="run" class="primary">Run now</button>
+  <button id="opts">Settings</button>
+  <span id="status" class="grow muted"></span>
+</div>
+<div id="next" class="muted"></div>
+
+<div id="error" class="err"></div>
+
+<div class="row">
+  <h2 class="grow">Would close <span id="count" class="muted"></span></h2>
+  <button id="review" class="link">review all</button>
+</div>
+<div id="proposal"><div class="empty">No run yet.</div></div>
+
+<h2>Archive</h2>
+<div id="archive"><div class="empty">Nothing archived.</div></div>
+
+<script type="module" src="popup.js"></script>

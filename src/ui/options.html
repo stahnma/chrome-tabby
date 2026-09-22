@@ -1,0 +1,69 @@
+<meta charset="utf-8">
+<title>Tabby settings</title>
+<link rel="stylesheet" href="common.css">
+<style>
+  body { max-width: 46rem; margin: 0 auto; padding: 24px; }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 0 16px; }
+  .preview { position: sticky; bottom: 0; background: var(--bg); border-top: 1px solid var(--line); padding: 10px 0; }
+  .warn { background: var(--card); border-left: 3px solid var(--close); padding: 8px 10px; margin: 10px 0; }
+</style>
+
+<h1>Tabby</h1>
+
+<h2>Connection</h2>
+<label for="apiKey">TypeSafe API key</label>
+<div class="row">
+  <input id="apiKey" type="password" class="grow" placeholder="stored locally, never synced" autocomplete="off">
+  <button id="saveKey">Save</button>
+</div>
+<label for="model">Model</label>
+<div class="row">
+  <input id="model" type="text" class="grow">
+  <button id="repin" title="Ask jev-latest which concrete version it is, and pin that">Re-pin</button>
+</div>
+<p class="muted">Pin a concrete version. <code>jev-latest</code> moves, and thresholds tuned on one
+version do not carry to the next. <code>GET /v1/models</code> only lists aliases, so Re-pin asks
+the API which version <code>jev-latest</code> currently resolves to.</p>
+
+<label for="transport">Transport</label>
+<select id="transport">
+  <option value="direct">direct — call the API from the extension</option>
+  <option value="mock">mock — deterministic fake answers, no network, no cost</option>
+  <option value="proxy">proxy — via your own server, key stays off the browser</option>
+</select>
+<div id="proxyWrap" hidden>
+  <label for="proxyUrl">Proxy base URL</label>
+  <input id="proxyUrl" type="text" placeholder="https://tabby-proxy.fly.dev">
+</div>
+
+<h2>Behavior</h2>
+<div id="liveWarn" class="warn" hidden></div>
+<label class="row"><input type="checkbox" id="shadowMode" style="width:auto"> &nbsp;Shadow mode — stage a proposal, close nothing</label>
+
+<div class="two">
+  <div><label for="minAgeHours">Minimum age (hours)</label><input id="minAgeHours" type="number" min="0"></div>
+  <div><label for="staleAfterDays">Age alone closes after (days, 0 = off)</label><input id="staleAfterDays" type="number" min="0"></div>
+  <div><label for="maxClosesPerRun">Max closes per run</label><input id="maxClosesPerRun" type="number" min="1"></div>
+  <div><label for="chunkSize">Tabs per request</label><input id="chunkSize" type="number" min="1" max="30"></div>
+  <div><label for="hour">Run at (local hour)</label><input id="hour" type="number" min="0" max="23"></div>
+</div>
+
+<h2>Thresholds</h2>
+<p class="muted">Independent gates, not a weighted score. A tab closes only if it clears every one.
+Changing these re-runs the decision locally against stored judgments — no API calls.</p>
+<div class="two" id="thresholds"></div>
+
+<h2>Never touch</h2>
+<label for="denylist">Denylisted hosts — one per line, subdomains included</label>
+<textarea id="denylist" rows="6"></textarea>
+
+<div class="preview">
+  <div class="row">
+    <button id="save" class="primary">Save</button>
+    <button id="reset" title="Discard saved settings and start from current defaults">Reset to defaults</button>
+    <span id="msg" class="grow muted"></span>
+  </div>
+  <div id="previewOut" class="muted">—</div>
+</div>
+
+<script type="module" src="options.js"></script>

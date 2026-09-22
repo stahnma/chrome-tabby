@@ -1,0 +1,51 @@
+:root {
+  --bg: #ffffff; --fg: #18181b; --muted: #71717a; --line: #e4e4e7;
+  --card: #fafafa; --accent: #2563eb; --close: #b91c1c; --keep: #15803d;
+}
+/* Dark tokens are declared twice on purpose: the media query covers the OS setting, the
+   attribute scope covers an explicit stamp. The chart block in review.html does the same,
+   so the two can never disagree and leave dark ink on a light card. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #18181b; --fg: #f4f4f5; --muted: #a1a1aa; --line: #3f3f46;
+    --card: #27272a; --accent: #60a5fa; --close: #f87171; --keep: #4ade80;
+  }
+}
+:root[data-theme="dark"] {
+    --bg: #18181b; --fg: #f4f4f5; --muted: #a1a1aa; --line: #3f3f46;
+    --card: #27272a; --accent: #60a5fa; --close: #f87171; --keep: #4ade80;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; padding: 12px; background: var(--bg); color: var(--fg);
+  font: 13px/1.45 system-ui, -apple-system, sans-serif;
+}
+h1 { font-size: 14px; margin: 0 0 8px; }
+h2 { font-size: 12px; margin: 16px 0 6px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
+button {
+  font: inherit; padding: 6px 12px; border: 1px solid var(--line); border-radius: 6px;
+  background: var(--card); color: var(--fg); cursor: pointer;
+}
+button.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+button:disabled { opacity: .5; cursor: default; }
+button.link { border: 0; background: none; color: var(--accent); padding: 2px 4px; text-decoration: underline; }
+input[type=text], input[type=password], input[type=number], textarea, select {
+  font: inherit; padding: 5px 7px; border: 1px solid var(--line); border-radius: 6px;
+  background: var(--bg); color: var(--fg); width: 100%;
+}
+label { display: block; margin: 10px 0 3px; color: var(--muted); }
+.row { display: flex; gap: 8px; align-items: center; }
+.row > * { flex: 0 0 auto; }
+.grow { flex: 1 1 auto; min-width: 0; }
+.muted { color: var(--muted); }
+.item {
+  padding: 6px 8px; border: 1px solid var(--line); border-radius: 6px;
+  background: var(--card); margin-bottom: 4px;
+}
+.title { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.url { font-size: 11px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.why { font-size: 11px; color: var(--muted); margin-top: 2px; }
+.close-b { border-left: 3px solid var(--close); }
+.keep-b { border-left: 3px solid var(--keep); }
+.empty { color: var(--muted); padding: 10px 0; }
+.err { color: var(--close); }

@@ -1,0 +1,91 @@
+<meta charset="utf-8">
+<title>Tabby — proposal review</title>
+<link rel="stylesheet" href="common.css">
+<style>
+  body { max-width: 68rem; margin: 0 auto; padding: 24px; }
+  .bar { display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; }
+
+  /* Stat tiles: the headline numbers are not a chart. */
+  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(8.5rem, 1fr)); gap: 8px; margin: 12px 0 4px; }
+  .tile { border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; background: var(--card); }
+  .tile .n { font-size: 22px; font-variant-numeric: tabular-nums; line-height: 1.1; }
+  .tile .k { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+
+  /* One validated hue for every distribution; they are small multiples of one measure. */
+  .viz-root {
+    --surface-1: #fcfcfb; --series-1: #2a78d6;
+    --ink-1: #0b0b0b; --ink-2: #52514e; --grid: #e4e4e7;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:where(:not([data-theme="light"])) .viz-root {
+      --surface-1: #1a1a19; --series-1: #3987e5;
+      --ink-1: #ffffff; --ink-2: #c3c2b7; --grid: #3f3f46;
+    }
+  }
+  :root[data-theme="dark"] .viz-root {
+    --surface-1: #1a1a19; --series-1: #3987e5;
+    --ink-1: #ffffff; --ink-2: #c3c2b7; --grid: #3f3f46;
+  }
+  .charts { display: grid; grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr)); gap: 14px; margin: 8px 0 4px; }
+  .chart { border: 1px solid var(--line); border-radius: 8px; padding: 10px 10px 4px; background: var(--card); }
+  .chart h3 { margin: 0; font-size: 12px; color: var(--ink-1); }
+  .chart .sub { font-size: 11px; color: var(--ink-2); margin-bottom: 4px; }
+  .chart svg { display: block; width: 100%; height: auto; min-height: 120px; overflow: visible; }
+  .chart rect.bin { fill: var(--series-1); }
+  .chart rect.hit { fill: transparent; }
+  .chart .axis { stroke: var(--grid); stroke-width: 1; }
+  .chart .tick { fill: var(--ink-2); font-size: 9px; }
+  .chart .thresh { stroke: var(--ink-1); stroke-width: 2; stroke-dasharray: 3 3; }
+  .chart .threshLabel { fill: var(--ink-1); font-size: 9px; font-weight: 600; }
+
+  #tip {
+    position: fixed; pointer-events: none; opacity: 0; transition: opacity .1s;
+    background: var(--ink-1); color: var(--bg); padding: 4px 7px; border-radius: 5px;
+    font-size: 11px; white-space: nowrap; z-index: 10;
+  }
+
+  table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  td { padding: 5px 6px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  td.age { white-space: nowrap; color: var(--muted); width: 4rem; }
+  td.why { color: var(--muted); width: 38%; }
+  td.act { width: 4rem; text-align: right; }
+  .group > summary { cursor: pointer; padding: 4px 0; color: var(--muted); }
+  td.act { white-space: nowrap; }
+  td.act button { margin-left: 6px; }
+  .fb { font-size: 11px; }
+  .tune { border: 1px solid var(--line); border-radius: 8px; padding: 12px; background: var(--card); }
+  .tune table { margin: 8px 0; }
+  .tune .move { font-variant-numeric: tabular-nums; }
+  .ok { color: var(--keep); }
+</style>
+
+<h1>Proposal review</h1>
+<div class="bar" id="meta"></div>
+<div class="bar muted" id="snap"></div>
+
+<div class="tiles" id="tiles"></div>
+
+<h2>Where the judgments landed</h2>
+<p class="muted">One bar per 0.1 band, counting tabs. The dashed line is your current
+threshold — a line sitting inside a cluster rather than a gap is a threshold worth moving.</p>
+<div class="viz-root"><div class="charts" id="charts"></div></div>
+
+<div class="bar">
+  <h2 class="grow">Would close <span id="closeCount"></span></h2>
+  <button id="closeAll">Close all of these</button>
+</div>
+<div id="closers"></div>
+
+<h2>Kept, by reason</h2>
+<div id="keepers"></div>
+
+<h2>Tune from your feedback</h2>
+<div id="tune" class="tune"><div class="empty">Loading…</div></div>
+
+<h2>Recently closed</h2>
+<p class="muted">Everything the nightly run closed, and everything you closed by hand.
+Restoring one also unlocks live mode.</p>
+<div id="closed"></div>
+
+<div id="tip"></div>
+<script type="module" src="review.js"></script>

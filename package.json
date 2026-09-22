@@ -1,0 +1,15 @@
+{
+  "name": "chrome-tabby",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Nightly, judges every open Chrome tab with TypeSafe's Jev and archives + closes the ones that are safe to close.",
+  "scripts": {
+    "test": "node test/linkcheck.mjs && node --test \"test/**/*.test.js\"",
+    "typecheck": "tsc"
+  },
+  "devDependencies": {
+    "@types/chrome": "^0.0.287",
+    "typescript": "^5.7.2"
+  }
+}
