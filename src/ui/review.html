@@ -51,6 +51,10 @@
   td.act { width: 4rem; text-align: right; }
   .group > summary { cursor: pointer; padding: 4px 0; color: var(--muted); }
   td.act { white-space: nowrap; }
+  td.jump { cursor: pointer; }
+  td.jump:hover > div:first-child { text-decoration: underline; }
+  td.jump.gone { cursor: default; opacity: .55; }
+  td.jump.gone:hover > div:first-child { text-decoration: none; }
   td.act button { margin-left: 6px; }
   .fb { font-size: 11px; }
   .tune { border: 1px solid var(--line); border-radius: 8px; padding: 12px; background: var(--card); }

@@ -404,3 +404,43 @@ test('an always-close host still respects hard skips and minimum age', async () 
   });
   assert.equal(pinned.items[0].action, 'keep', 'pinned still wins');
 });
+
+test('focusTab activates the tab and its window', async () => {
+  const env = installFakeChrome({ tabs: [fakeTab({ id: 7, windowId: 3, url: 'https://x.test/a' })] });
+  const updates = [];
+  const winUpdates = [];
+  globalThis.chrome.tabs.update = async (id, props) => { updates.push({ id, props }); };
+  globalThis.chrome.windows = { update: async (id, props) => { winUpdates.push({ id, props }); } };
+
+  const { focusTab } = await import(`../src/ui/close.js?t=${Math.random()}`);
+  const r = await focusTab({ tabId: 7, url: 'https://x.test/a' });
+
+  assert.equal(r.ok, true);
+  assert.deepEqual(updates, [{ id: 7, props: { active: true } }]);
+  assert.deepEqual(winUpdates, [{ id: 3, props: { focused: true } }], 'the window must come forward too');
+});
+
+test('focusTab finds the tab by url when the id is stale', async () => {
+  // Same restart problem the close path had: every id in a staged proposal is renumbered.
+  installFakeChrome({ tabs: [fakeTab({ id: 99, windowId: 4, url: 'https://x.test/a?tracking=1' })] });
+  const updates = [];
+  globalThis.chrome.tabs.update = async (id, props) => { updates.push({ id, props }); };
+  globalThis.chrome.windows = { update: async () => {} };
+
+  const { focusTab } = await import(`../src/ui/close.js?t=${Math.random()}`);
+  const r = await focusTab({ tabId: 12, url: 'https://x.test/a' });
+
+  assert.equal(r.ok, true);
+  assert.equal(updates[0].id, 99, 'matched on the sanitized url, not the dead id');
+});
+
+test('focusTab reports a tab that is genuinely gone', async () => {
+  installFakeChrome({ tabs: [] });
+  globalThis.chrome.tabs.update = async () => { throw new Error('should not be called'); };
+  globalThis.chrome.windows = { update: async () => {} };
+
+  const { focusTab } = await import(`../src/ui/close.js?t=${Math.random()}`);
+  const r = await focusTab({ tabId: 1, url: 'https://x.test/gone' });
+  assert.equal(r.ok, false);
+  assert.match(r.reason, /no longer open/);
+});

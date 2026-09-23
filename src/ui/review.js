@@ -1,6 +1,6 @@
 // @ts-check
 import { send, $, el, setChildren, StaleContextError, showStaleBanner } from './msg.js';
-import { closeTabs } from './close.js';
+import { closeTabs, focusTab } from './close.js';
 
 const NS = 'http://www.w3.org/2000/svg';
 const svgEl = (tag, attrs = {}) => {
@@ -149,11 +149,21 @@ function row(d, onClose, onFeedback) {
       console.error('[tabby] close failed', e);
     }
   });
+  // The title is the natural thing to click when you want to go look at the tab.
+  const jump = el('td', { className: 'jump', title: 'Go to this tab' },
+    el('div', { textContent: d.title || '(untitled)' }),
+    el('div', { className: 'url', textContent: d.url }));
+  jump.addEventListener('click', async () => {
+    const r = await focusTab({ tabId: d.tabId, url: d.url });
+    if (!r.ok) {
+      jump.classList.add('gone');
+      jump.title = r.reason ?? 'not open';
+    }
+  });
+
   return el('tr', {},
     el('td', { className: 'age', textContent: fmtAge(d.ageHours) }),
-    el('td', {},
-      el('div', { textContent: d.title || '(untitled)' }),
-      el('div', { className: 'url', textContent: d.url })),
+    jump,
     el('td', { className: 'why', textContent: d.reasons.map((r) => r.detail).join(' · ') }),
     el('td', { className: 'act' },
       // Offer only the opinions that make sense for what it decided.
