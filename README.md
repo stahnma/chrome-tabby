@@ -24,8 +24,11 @@ the extensions page.
 
 ## How it fits together
 
-See [docs/data-flow.md](docs/data-flow.md) for a diagram of what stays local versus what
-reaches Jev, with a real request payload.
+<img src="docs/dataflow.svg" alt="Data flow: only a tab's title and sanitized URL cross the network to Jev; recency, tab flags and all thresholds stay in the browser, where the decision is made." width="920">
+
+Only `{title, url}` leaves the browser. Recency, tab flags, every threshold and all your
+feedback stay local — and so does the decision itself. Jev returns five probabilities per tab
+and stops.
 
 ```
 tabs.js      snapshot every tab, sanitize the URL
@@ -38,6 +41,9 @@ The split between `evaluate` and `decide` is the central design decision. Raw ju
 persisted, and `decide()` is a pure function over them, so **changing a threshold re-decides
 instantly at zero cost** — you can replay every past night against new settings without
 re-asking anything.
+
+[docs/data-flow.md](docs/data-flow.md) walks through a real request payload and what each
+part of it is doing.
 
 ## Decisions worth knowing
 
