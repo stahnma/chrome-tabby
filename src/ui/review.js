@@ -107,7 +107,10 @@ function histogram(values, threshold, label, hint) {
 
 /** A one-click opinion. Typing a reason is friction; four buttons is not. */
 function fbButton(d, reason, text, onFeedback) {
-  const b = el('button', { className: 'link fb', textContent: text, title: REASON_HINTS[reason] ?? '' });
+  const b = el('button', {
+    className: 'link fb', textContent: text, title: REASON_HINTS[reason] ?? '',
+    dataset: { rowKey: `${d.evidenceHash}:${reason}` },
+  });
   b.addEventListener('click', async () => {
     b.disabled = true;
     b.textContent = '\u2026';
@@ -130,7 +133,9 @@ const REASON_HINTS = {
 };
 
 function row(d, onClose, onFeedback) {
-  const btn = el('button', { className: 'link', textContent: 'close' });
+  const btn = el('button', {
+    className: 'link', textContent: 'close', dataset: { rowKey: `${d.evidenceHash}:close` },
+  });
   btn.addEventListener('click', async () => {
     btn.disabled = true;
     btn.textContent = '…';
@@ -184,7 +189,33 @@ function archiveRow(e, onRestore) {
     el('td', { className: 'act' }, btn));
 }
 
-async function load() {
+/**
+ * A full re-render throws away every <details> the reader opened and drops them back to
+ * the top of the page. Capture the bits of UI state that belong to the reader rather than
+ * the data, and put them back afterwards.
+ */
+function captureViewState() {
+  return {
+    open: [...document.querySelectorAll('details.group[open]')].map((d) => d.dataset.code),
+    scrollY: window.scrollY,
+    focus: document.activeElement?.dataset?.rowKey ?? null,
+  };
+}
+
+function restoreViewState(state) {
+  for (const d of document.querySelectorAll('details.group')) {
+    if (state.open.includes(d.dataset.code)) d.open = true;
+  }
+  // Restore after layout has settled, or the target offset does not exist yet.
+  requestAnimationFrame(() => {
+    window.scrollTo({ top: state.scrollY, behavior: 'instant' });
+    if (state.focus) {
+      document.querySelector(`[data-row-key="${CSS.escape(state.focus)}"]`)?.focus();
+    }
+  });
+}
+
+async function load(viewState = captureViewState()) {
   const [proposal, { settings }, archive] = await Promise.all([
     send('getProposal'), send('getSettings'), send('getArchive'),
   ]);
@@ -256,7 +287,7 @@ async function load() {
   }
   setChildren($('#keepers'), [...byReason.entries()]
     .sort((a, b) => b[1].length - a[1].length)
-    .map(([code, group]) => el('details', { className: 'group' },
+    .map(([code, group]) => el('details', { className: 'group', dataset: { code } },
       el('summary', { textContent: `${LABELS[code] ?? code} — ${group.length}` }),
       table(group, (id) => closeThen([id]), onFeedback))));
 
@@ -266,6 +297,7 @@ async function load() {
     : el('div', { className: 'empty', textContent: 'Nothing closed yet.' }));
 
   await renderTuning();
+  restoreViewState(viewState);
 
   $('#closeAll').onclick = async () => {
     $('#closeAll').disabled = true;

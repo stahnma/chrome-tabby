@@ -61,3 +61,41 @@ test('setChildren clears with an empty array', () => {
   setChildren(n, []);
   assert.equal(n.kids.length, 0);
 });
+
+/**
+ * `dataset` is a read-only accessor on a real Element: Object.assign onto the element
+ * silently drops it, and assigning to it throws under module strict mode. The helper has
+ * to merge into it. Reproduced against a node that behaves the same way.
+ */
+function elementLike() {
+  const ds = {};
+  const node = { kids: [], className: '', textContent: '' };
+  Object.defineProperty(node, 'dataset', {
+    get: () => ds,
+    set() { throw new TypeError('Cannot set property dataset'); },
+  });
+  return node;
+}
+
+const el = (node, props = {}) => {
+  const { dataset, ...rest } = props;
+  Object.assign(node, rest);
+  if (dataset) Object.assign(node.dataset, dataset);
+  return node;
+};
+
+test('assigning dataset wholesale throws, which is why el() splits it out', () => {
+  assert.throws(() => Object.assign(elementLike(), { dataset: { code: 'X' } }), TypeError);
+});
+
+test('el merges into dataset instead of replacing it', () => {
+  const n = el(elementLike(), { className: 'group', dataset: { code: 'WIP' } });
+  assert.equal(n.dataset.code, 'WIP');
+  assert.equal(n.className, 'group');
+});
+
+test('el is unaffected when no dataset is passed', () => {
+  const n = el(elementLike(), { textContent: 'hi' });
+  assert.equal(n.textContent, 'hi');
+  assert.deepEqual(n.dataset, {});
+});

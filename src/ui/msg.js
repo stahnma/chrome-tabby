@@ -59,7 +59,11 @@ export function showStaleBanner() {
 }
 export const $ = (sel, root = document) => root.querySelector(sel);
 export const el = (tag, props = {}, ...kids) => {
-  const n = Object.assign(document.createElement(tag), props);
+  // `dataset` is a read-only accessor, so Object.assign onto it throws under module
+  // strict mode. Merge into it instead of replacing it.
+  const { dataset, ...rest } = props;
+  const n = Object.assign(document.createElement(tag), rest);
+  if (dataset) Object.assign(n.dataset, dataset);
   for (const k of kids.flat(Infinity)) if (k != null) n.append(k);
   return n;
 };
