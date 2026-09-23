@@ -1,84 +1,110 @@
 # Tabby
 
-A personal Chrome extension that judges every open tab each night and archives + closes the
-ones that are safe to close.
+Keeps a browser full of tabs tidy, without you having to think about it.
 
-Judgments come from [TypeSafe AI's **Jev**](https://docs.typesafe.ai) — a "System One" model
-that returns typed decisions with calibrated probabilities rather than text. It is not an LLM
-and cannot be fine-tuned; the policy layered on top of it is what learns.
+If you routinely run several dozen open tabs, most of them are dead weight — a search results
+page you already used, a 404, a site that logged you out three weeks ago. A handful are not:
+an open pull request, a half-finished checkout, the article you actually mean to read. Closing
+the first group by hand means picking through the second, which is why nobody does it.
 
-## Running it
+Tabby looks at every open tab each night, decides which ones you would not miss, and closes
+them — after archiving each one so nothing is ever truly gone.
 
-```sh
-npm test        # 185 tests + a static check, no browser needed
-```
+It ships in **shadow mode**: for as long as you like, it only shows you what it *would* close.
+Nothing disappears until you say so.
 
-Load the repo root as an unpacked extension (`chrome://extensions` → Developer mode →
-Load unpacked). It ships in **shadow mode with a mock transport**, so the first run costs
-nothing, touches no network, and closes nothing — it just stages a proposal over your real
-tabs. Add an API key in Settings and switch transport to `direct` for real judgments.
+## What decides
 
-Reloading: UI pages (`popup`, `options`, `review`) pick up changes when you reopen them.
-Anything the service worker runs needs `chrome.runtime.reload()` from its console, or ↻ on
-the extensions page.
+Judgments come from [TypeSafe AI's **Jev**](https://docs.typesafe.ai), which is not a chatbot.
+Given a tab's title and address it answers five narrow questions with probabilities — *is this
+unfinished work? already consumed? easy to find again? deliberately saved? an error or a login
+wall?* — and your settings turn those into a verdict.
 
-## How it fits together
+It costs about half a cent for a full sweep of 70-odd tabs, and most nights nothing at all,
+because a tab is only ever judged once.
+
+## Setting it up
+
+**1. Install it.** Go to `chrome://extensions`, turn on **Developer mode**, click **Load
+unpacked**, and pick this folder. Chrome 121 or newer.
+
+**2. Try it with no account.** Click the Tabby icon → **Run now**. The first run uses fake
+judgments, costs nothing, and touches no network — it exists so you can see the shape of the
+thing against your real tabs. The header reads `shadow · mock` so you know it isn't real yet.
+
+**3. Point it at the real model.** Get an API key from [typesafe.ai](https://typesafe.ai),
+then **Settings** → paste the key → **Save** → set Transport to `direct` → **Save** again.
+Now **Run now** for real. The first real sweep judges every tab; later ones are nearly free.
+
+**4. Read what it proposes.** The popup lists what it would close; **review all** opens the
+full page, which is where the interesting part is — every tab it *kept*, grouped by the reason
+it was spared. That tells you which setting is doing the work.
+
+**5. Let it watch for a couple of weeks** before giving it teeth. Shadow mode costs you
+nothing and it is the only way to find out whether the thresholds match your judgment.
+
+**6. Turn it loose.** Restore one archived tab from the popup first — that proves the safety
+net works, and it is what unlocks the toggle. Then **Settings** → uncheck **Shadow mode**.
+From then on it runs at 3:30am and closes quietly.
+
+## Using it
+
+**Teach it, one click at a time.** On the review page each row offers the corrections that
+make sense for it: *keep it* when it was wrong, *dead* when it missed an error page, and
+*never / always this site* for whole domains. The site rules take effect immediately.
+
+You also teach it just by using it — closing a tab by hand records "you missed this", and
+restoring one records "you shouldn't have closed this".
+
+**Then let it retune itself.** The **Tune from your feedback** panel replays every correction
+you have made against thousands of candidate settings and tells you plainly what it found:
+*"agrees with 78% of your decisions; raising work-in-progress from 0.25 to 0.45 resolves 6
+disagreements."* Applying it is one click, and it never costs a request.
+
+It deliberately weights closing something you wanted **three times** worse than leaving a
+stale tab open.
+
+**What it will never close**, regardless of any setting: a pinned tab, a tab playing audio,
+the tab you're looking at, the only tab in a window, anything on your never-close list, and
+anything opened in the last few hours.
+
+## Settings worth knowing
+
+| | |
+|---|---|
+| **Shadow mode** | On: proposes only. Off: closes for real. Default on. |
+| **Minimum age** | How long a tab must sit untouched before it's a candidate. Default 2 hours. |
+| **Age alone closes after** | Past this, staleness is enough on its own. Default 14 days; 0 turns it off. |
+| **Max closes per run** | A cap on the damage from any one night. Default 25. |
+| **Thresholds** | The five gates. Drag them and the preview updates instantly. |
+| **Never close** | Hosts to leave alone entirely. |
+
+## What leaves your browser
 
 <img src="docs/dataflow.svg" alt="Data flow: only a tab's title and sanitized URL cross the network to Jev; recency, tab flags and all thresholds stay in the browser, where the decision is made." width="920">
 
-Only `{title, url}` leaves the browser. Recency, tab flags, every threshold and all your
-feedback stay local — and so does the decision itself. Jev returns five probabilities per tab
-and stops.
+Only a tab's **title and address** are ever sent, and the address is stripped first: query
+strings, fragments, and anything that looks like a token or an id are removed, so a one-time
+login link goes as `fly.io/app/auth/cli/…`.
 
+Everything else stays on your machine — when you last looked at a tab, whether it's pinned,
+your thresholds, your feedback, and the decision itself. Tabby never reads page *content*;
+it holds no permission that would let it.
+
+[docs/data-flow.md](docs/data-flow.md) shows a real request, if you want to see exactly what
+that looks like.
+
+## If something looks wrong
+
+Open `chrome://extensions` → Tabby → **service worker**, and run:
+
+```js
+await tabby.diagnose()
 ```
-tabs.js      snapshot every tab, sanitize the URL
-evaluate.js  ask Jev for whatever the cache is missing   <- the only step that costs money
-decide.js    pure: judgments + settings + now -> close/keep
-execute.js   shadow: stage a proposal. live: archive, then close.
-```
 
-The split between `evaluate` and `decide` is the central design decision. Raw judgments are
-persisted, and `decide()` is a pure function over them, so **changing a threshold re-decides
-instantly at zero cost** — you can replay every past night against new settings without
-re-asking anything.
+That reports which settings are actually in force, which judgments are cached, and why each
+tab was kept — enough to tell tuning from a bug.
 
-[docs/data-flow.md](docs/data-flow.md) walks through a real request payload and what each
-part of it is doing.
+---
 
-## Decisions worth knowing
-
-**Evidence is `{title, url}` and nothing else.** No recency, no tab flags. Those change every
-run, so including them would change the cache key every run and re-bill inference nightly.
-Time lives in `decide()`, never in the model state.
-
-**The judgment cache is keyed per facet**, on a hash of that question's exact instruction text
-*and* criteria *and* the model version. Rewording one question re-asks only that question.
-
-**Pin a concrete model version.** `jev-latest` resolves to something concrete in the response,
-which can never equal the alias — so it would miss the cache on every single tab. A run that
-sees an alias re-pins itself.
-
-**Gates, not a weighted score.** Probabilities from separate questions cannot be combined
-arithmetically (a noul and its negation do not sum to 1), so each condition stands alone.
-It is also far easier to debug: every kept tab names the gate that stopped it.
-
-**Query strings, fragments, and opaque path segments are stripped** before anything leaves the
-browser. Paths matter too — one-time auth links put the secret in the path.
-
-**A false close costs 3× a false keep** in the tuner. Closing something you wanted destroys
-work; leaving a stale tab open costs nothing.
-
-## Layout
-
-| path | what it owns |
-|---|---|
-| `src/core/decide.js` | the rule engine — pure, and where the real logic lives |
-| `src/core/questions.js` | the prompts; the product's behavior is this prose |
-| `src/core/evaluate.js` | cache partitioning, chunking, calling the transport |
-| `src/core/feedback.js` | scoring your labels, sweeping thresholds |
-| `src/transport/` | `direct` (real), `proxy` (key stays server-side), `mock` (offline) |
-| `src/ui/` | popup, options, review |
-
-`decide.js`, `evidence.js`, `questions.js`, `url.js`, `feedback.js` and `backoff.js` never
-reference `chrome.*`. That is enforced by `test/linkcheck.mjs` and is why the tests need no
-browser and no mocking.
+Building on it? See [docs/development.md](docs/development.md).
