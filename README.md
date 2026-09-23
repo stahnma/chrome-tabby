@@ -13,6 +13,12 @@ them — after archiving each one so nothing is ever truly gone.
 It ships in **shadow mode**: for as long as you like, it only shows you what it *would* close.
 Nothing disappears until you say so.
 
+<img src="docs/review-page.png" alt="The review page: counts across the top, then a histogram per question showing where every tab scored with your threshold drawn on it, then the tabs it would close, then the ones it kept grouped by the reason each was spared." width="900">
+
+The review page is where you decide whether to trust it. Every tab it *kept* is grouped by
+the reason it was spared, and each histogram shows where your threshold falls against the
+actual spread — a line sitting inside a cluster rather than a gap is a line worth moving.
+
 ## What decides
 
 Judgments come from [TypeSafe AI's **Jev**](https://docs.typesafe.ai), which is not a chatbot.
