@@ -3,8 +3,12 @@
 ## Running the tests
 
 ```sh
-npm test        # 191 tests plus a static check; no browser, no mocking
+npm test         # 191 tests plus a static check; no browser, no mocking
+npm run typecheck # tsc over src/ -- the code is plain JS with JSDoc types
 ```
+
+Both run on every pull request (`.github/workflows/test.yml`), and `main` requires them
+to pass.
 
 The suite runs under `node --test` because most of the codebase never touches `chrome.*`.
 `decide.js`, `evidence.js`, `questions.js`, `url.js`, `feedback.js` and `backoff.js` are pure,

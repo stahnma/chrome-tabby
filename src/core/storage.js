@@ -48,13 +48,12 @@ export async function resetSettings() {
 /**
  * @param {Partial<import('./schema.js').Settings>} patch
  * Callers that change `schedule` should re-arm the alarm afterwards; background.js does.
+ * Use `scheduleChanged` to tell whether that is needed.
  */
 export async function patchSettings(patch) {
   const prev = await getSettings();
   const next = { ...prev, ...patch };
   await set(K.SETTINGS, next);
-  next._scheduleChanged =
-    prev.schedule.hour !== next.schedule.hour || prev.schedule.minute !== next.schedule.minute;
   return next;
 }
 
@@ -101,6 +100,15 @@ export const setRunState = (s) => set(K.RUN_STATE, { ...s, lastTickAt: Date.now(
 export const getArchive = () => get(K.ARCHIVE, []);
 /** @param {any[]} a */
 export const setArchive = (a) => set(K.ARCHIVE, a);
+
+/**
+ * Did a patch move the nightly time? Kept separate from the settings object so the stored
+ * shape stays exactly the declared one.
+ * @param {import('./schema.js').Settings} before
+ * @param {import('./schema.js').Settings} after
+ */
+export const scheduleChanged = (before, after) =>
+  before.schedule.hour !== after.schedule.hour || before.schedule.minute !== after.schedule.minute;
 
 export const getFeedback = () => get(K.FEEDBACK, []);
 /** @param {any[]} f */

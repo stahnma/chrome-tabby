@@ -28,6 +28,7 @@ function seeded(str) {
 /** Aliases the real service resolves to a concrete version id. */
 const ALIASES = new Set(['jev-latest', 'jev-preview']);
 
+/** @type {[RegExp, Record<string, number>][]} */
 const HINTS = [
   [/\/search\b|[?&]q=|duckduckgo|www\.google\.com\/search/i, { disposable: 0.93, savedForLater: 0.05, wip: 0.03 }],
   [/news\.ycombinator|reddit\.com|twitter\.com|x\.com|bsky/i, { disposable: 0.85, savedForLater: 0.15 }],

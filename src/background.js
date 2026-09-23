@@ -13,6 +13,7 @@ import { sweepThresholds, previewChange, REASONS } from './core/feedback.js';
 import {
   ensureSchema, getSettings, patchSettings, getApiKey, setApiKey,
   getProposal, getArchive, getRunState, getRunLog, dump, resetSettings, getFeedback,
+  scheduleChanged,
 } from './core/storage.js';
 
 chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
@@ -64,8 +65,9 @@ const HANDLERS = {
   reschedule: async () => ({ when: await schedule() }),
   getSettings: async () => ({ settings: await getSettings(), hasApiKey: !!(await getApiKey()) }),
   patchSettings: async (msg) => {
+    const before = await getSettings();
     const next = await patchSettings(msg.patch ?? {});
-    if (next._scheduleChanged) await schedule(next);
+    if (scheduleChanged(before, next)) await schedule(next);
     return next;
   },
   setApiKey: async (msg) => { await setApiKey(msg.apiKey ?? ''); return { ok: true }; },

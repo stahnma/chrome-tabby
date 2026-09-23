@@ -78,5 +78,6 @@ export const el = (tag, props = {}, ...kids) => {
  * @param {Node|Node[]|null} kids
  */
 export const setChildren = (node, kids) => {
-  node.replaceChildren(...[kids].flat(Infinity).filter((k) => k != null));
+  const flat = /** @type {Node[]} */ ([kids].flat(Infinity).filter((k) => k != null));
+  node.replaceChildren(...flat);
 };

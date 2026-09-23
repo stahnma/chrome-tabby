@@ -1,0 +1,37 @@
+name: test
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  # A new push supersedes the run already in flight for the same branch.
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+
+      # Only dev dependencies exist (typescript and type stubs); the tests themselves
+      # need nothing installed, which is why they can run before this succeeds.
+      - run: npm ci
+
+      # Imports resolve, manifest entry points exist, every UI message has a handler,
+      # no inline handlers, and the pure modules stay free of chrome.* .
+      - run: node test/linkcheck.mjs
+
+      - run: npm test
+
+      - run: npm run typecheck

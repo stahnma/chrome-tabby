@@ -206,21 +206,25 @@ function archiveRow(e, onRestore) {
  */
 function captureViewState() {
   return {
-    open: [...document.querySelectorAll('details.group[open]')].map((d) => d.dataset.code),
+    open: [...document.querySelectorAll('details.group[open]')]
+      .map((d) => /** @type {HTMLElement} */ (d).dataset.code),
     scrollY: window.scrollY,
-    focus: document.activeElement?.dataset?.rowKey ?? null,
+    focus: /** @type {HTMLElement|null} */ (document.activeElement)?.dataset?.rowKey ?? null,
   };
 }
 
 function restoreViewState(state) {
-  for (const d of document.querySelectorAll('details.group')) {
+  for (const node of document.querySelectorAll('details.group')) {
+    const d = /** @type {HTMLDetailsElement} */ (node);
     if (state.open.includes(d.dataset.code)) d.open = true;
   }
   // Restore after layout has settled, or the target offset does not exist yet.
   requestAnimationFrame(() => {
     window.scrollTo({ top: state.scrollY, behavior: 'instant' });
     if (state.focus) {
-      document.querySelector(`[data-row-key="${CSS.escape(state.focus)}"]`)?.focus();
+      /** @type {HTMLElement|null} */ (
+        document.querySelector(`[data-row-key="${CSS.escape(state.focus)}"]`)
+      )?.focus();
     }
   });
 }
