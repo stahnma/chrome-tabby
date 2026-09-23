@@ -24,6 +24,9 @@ the extensions page.
 
 ## How it fits together
 
+See [docs/data-flow.md](docs/data-flow.md) for a diagram of what stays local versus what
+reaches Jev, with a real request payload.
+
 ```
 tabs.js      snapshot every tab, sanitize the URL
 evaluate.js  ask Jev for whatever the cache is missing   <- the only step that costs money

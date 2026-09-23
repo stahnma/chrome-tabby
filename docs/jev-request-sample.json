@@ -1,0 +1,97 @@
+{
+  "model": "jev-1.13.0",
+  "state": {
+    "tabs": [
+      {
+        "title": "Page not found – Claude",
+        "url": "https://claude.ai/code/artifact/…"
+      },
+      {
+        "title": "CLI Sign in · Fly",
+        "url": "https://fly.io/app/auth/cli/…"
+      }
+    ]
+  },
+  "questions": {
+    "t0_wip": {
+      "type": "noul",
+      "instructions": "Consider only the single browser tab described at `tabs[0]`, using `tabs[0].title` and `tabs[0].url`. Query strings and fragments have been removed from the URL, so the title often carries most of the meaning. Does this tab look like an unfinished task that the person still intends to come back to and act on -- for example an open pull request or code review, a bug report or ticket, a partially filled form, a checkout or payment flow, a document or message being drafted, a cloud console or admin panel in the middle of being configured, or a locally running development server? A page that failed to load or no longer exists is never work in progress, however task-like its address looks. Neither is a sign-in or login screen: when a site has logged the person out or their session has expired, whatever they were doing there is over, and signing in again is not itself the task. Answer for the likelihood that closing this tab right now would interrupt work that is genuinely in progress.",
+      "criteria": {
+        "true": "A working page holding a task the person is partway through and would resume.",
+        "false": "Anything they could not resume here: finished with, purely informational, or not reachable at all -- a 404 or \"not found\" page, \"page unavailable\", an expired or broken link, a server error, or a login, sign-in, or \"session expired\" screen shown in place of content the person is no longer authenticated to see."
+      }
+    },
+    "t0_disp": {
+      "type": "noul",
+      "instructions": "Consider only the single browser tab described at `tabs[0]`, using `tabs[0].title` and `tabs[0].url`. Query strings and fragments have been removed from the URL, so the title often carries most of the meaning. Does this tab look like something that has already served its purpose and would not be missed -- for example a search engine results page, a social media feed or timeline, a news or site homepage, a video or other media that has been watched, an advertisement or marketing landing page, an error page, or a page opened only to check one fact? Count a login or sign-in screen here too: a tab left sitting on one has almost always been logged out or timed out after the person finished, so the page in front of them is a shell rather than the thing they came for. Answer for the likelihood that this tab is transient, already-consumed content.",
+      "criteria": {
+        "true": "Already served its purpose, or never had one -- including dead, errored and not-found pages, and login screens left behind by an expired session.",
+        "false": "Still holds something the person has not finished with. A sign-in screen they were deliberately part-way through, on a page opened moments ago, is not disposable."
+      }
+    },
+    "t0_retr": {
+      "type": "noul",
+      "instructions": "Consider only the single browser tab described at `tabs[0]`, using `tabs[0].title` and `tabs[0].url`. Query strings and fragments have been removed from the URL, so the title often carries most of the meaning. Suppose this tab were closed and the person later wanted it back. Is it a stable, well-known, publicly reachable page that an obvious search or a guess at the URL would find again -- as opposed to a one-time or expiring link, a generated or private or internal page, a result buried deep in a long list, or something the person would struggle to describe well enough to search for? Answer for the likelihood that this page would be easy to find again.",
+      "criteria": {
+        "true": "A stable public address, or something an obvious search would surface again.",
+        "false": "One-time, expiring, generated, private, internal, or buried too deep to re-find."
+      }
+    },
+    "t0_save": {
+      "type": "noul",
+      "instructions": "Consider only the single browser tab described at `tabs[0]`, using `tabs[0].title` and `tabs[0].url`. Query strings and fragments have been removed from the URL, so the title often carries most of the meaning. Does this look like something the person deliberately left open in order to read or consult later -- a long-form article, a tutorial or how-to guide, reference documentation, a specification, a research paper, a recipe, or a product they are still evaluating -- rather than something they already finished with? Answer for the likelihood that this tab was kept open on purpose as saved reading or reference material.",
+      "criteria": {
+        "true": "Deliberately parked to read or consult later.",
+        "false": "Landed on incidentally, already read, or not readable at all."
+      }
+    },
+    "t0_dead": {
+      "type": "noul",
+      "instructions": "Consider only the single browser tab described at `tabs[0]`, using `tabs[0].title` and `tabs[0].url`. Query strings and fragments have been removed from the URL, so the title often carries most of the meaning. Is this tab showing an error or a barrier instead of the content it was opened for -- a \"page not found\" or 404, \"this page is unavailable\", a server or application error, an expired or broken link, or a login, sign-in or \"your session has expired\" screen standing where the content used to be? Judge what the page is showing now, not what its address suggests it once held: an address that looks like a document, a ticket or an account page still counts here if the page itself is an error or a sign-in wall.",
+      "criteria": {
+        "true": "The visible page is an error, a not-found page, or a sign-in / session-expired screen -- there is no content on it to come back to.",
+        "false": "The page is showing real content, whatever that content happens to be."
+      }
+    },
+    "t1_wip": {
+      "type": "noul",
+      "instructions": "Consider only the single browser tab described at `tabs[1]`, using `tabs[1].title` and `tabs[1].url`. Query strings and fragments have been removed from the URL, so the title often carries most of the meaning. Does this tab look like an unfinished task that the person still intends to come back to and act on -- for example an open pull request or code review, a bug report or ticket, a partially filled form, a checkout or payment flow, a document or message being drafted, a cloud console or admin panel in the middle of being configured, or a locally running development server? A page that failed to load or no longer exists is never work in progress, however task-like its address looks. Neither is a sign-in or login screen: when a site has logged the person out or their session has expired, whatever they were doing there is over, and signing in again is not itself the task. Answer for the likelihood that closing this tab right now would interrupt work that is genuinely in progress.",
+      "criteria": {
+        "true": "A working page holding a task the person is partway through and would resume.",
+        "false": "Anything they could not resume here: finished with, purely informational, or not reachable at all -- a 404 or \"not found\" page, \"page unavailable\", an expired or broken link, a server error, or a login, sign-in, or \"session expired\" screen shown in place of content the person is no longer authenticated to see."
+      }
+    },
+    "t1_disp": {
+      "type": "noul",
+      "instructions": "Consider only the single browser tab described at `tabs[1]`, using `tabs[1].title` and `tabs[1].url`. Query strings and fragments have been removed from the URL, so the title often carries most of the meaning. Does this tab look like something that has already served its purpose and would not be missed -- for example a search engine results page, a social media feed or timeline, a news or site homepage, a video or other media that has been watched, an advertisement or marketing landing page, an error page, or a page opened only to check one fact? Count a login or sign-in screen here too: a tab left sitting on one has almost always been logged out or timed out after the person finished, so the page in front of them is a shell rather than the thing they came for. Answer for the likelihood that this tab is transient, already-consumed content.",
+      "criteria": {
+        "true": "Already served its purpose, or never had one -- including dead, errored and not-found pages, and login screens left behind by an expired session.",
+        "false": "Still holds something the person has not finished with. A sign-in screen they were deliberately part-way through, on a page opened moments ago, is not disposable."
+      }
+    },
+    "t1_retr": {
+      "type": "noul",
+      "instructions": "Consider only the single browser tab described at `tabs[1]`, using `tabs[1].title` and `tabs[1].url`. Query strings and fragments have been removed from the URL, so the title often carries most of the meaning. Suppose this tab were closed and the person later wanted it back. Is it a stable, well-known, publicly reachable page that an obvious search or a guess at the URL would find again -- as opposed to a one-time or expiring link, a generated or private or internal page, a result buried deep in a long list, or something the person would struggle to describe well enough to search for? Answer for the likelihood that this page would be easy to find again.",
+      "criteria": {
+        "true": "A stable public address, or something an obvious search would surface again.",
+        "false": "One-time, expiring, generated, private, internal, or buried too deep to re-find."
+      }
+    },
+    "t1_save": {
+      "type": "noul",
+      "instructions": "Consider only the single browser tab described at `tabs[1]`, using `tabs[1].title` and `tabs[1].url`. Query strings and fragments have been removed from the URL, so the title often carries most of the meaning. Does this look like something the person deliberately left open in order to read or consult later -- a long-form article, a tutorial or how-to guide, reference documentation, a specification, a research paper, a recipe, or a product they are still evaluating -- rather than something they already finished with? Answer for the likelihood that this tab was kept open on purpose as saved reading or reference material.",
+      "criteria": {
+        "true": "Deliberately parked to read or consult later.",
+        "false": "Landed on incidentally, already read, or not readable at all."
+      }
+    },
+    "t1_dead": {
+      "type": "noul",
+      "instructions": "Consider only the single browser tab described at `tabs[1]`, using `tabs[1].title` and `tabs[1].url`. Query strings and fragments have been removed from the URL, so the title often carries most of the meaning. Is this tab showing an error or a barrier instead of the content it was opened for -- a \"page not found\" or 404, \"this page is unavailable\", a server or application error, an expired or broken link, or a login, sign-in or \"your session has expired\" screen standing where the content used to be? Judge what the page is showing now, not what its address suggests it once held: an address that looks like a document, a ticket or an account page still counts here if the page itself is an error or a sign-in wall.",
+      "criteria": {
+        "true": "The visible page is an error, a not-found page, or a sign-in / session-expired screen -- there is no content on it to come back to.",
+        "false": "The page is showing real content, whatever that content happens to be."
+      }
+    }
+  }
+}
