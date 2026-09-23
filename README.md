@@ -69,7 +69,6 @@ work; leaving a stale tab open costs nothing.
 | `src/core/feedback.js` | scoring your labels, sweeping thresholds |
 | `src/transport/` | `direct` (real), `proxy` (key stays server-side), `mock` (offline) |
 | `src/ui/` | popup, options, review |
-| `spike/cors/` | throwaway; answered whether a service worker can reach the API. It can. |
 
 `decide.js`, `evidence.js`, `questions.js`, `url.js`, `feedback.js` and `backoff.js` never
 reference `chrome.*`. That is enforced by `test/linkcheck.mjs` and is why the tests need no
